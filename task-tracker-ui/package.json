@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.10.0",
+    "axios": "^1.20.0",
+    "framer-motion": "^14.6.0",
+    "lucide-react": "^1.61.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

@@ -144,3 +144,4 @@ C:\Users\admin\.vscode\TaskTrackerProject\TaskTracker.API\obj\Debug\net9.0\refin
 C:\Users\admin\.vscode\TaskTrackerProject\TaskTracker.API\obj\Debug\net9.0\TaskTracker.API.pdb
 C:\Users\admin\.vscode\TaskTrackerProject\TaskTracker.API\obj\Debug\net9.0\TaskTracker.API.genruntimeconfig.cache
 C:\Users\admin\.vscode\TaskTrackerProject\TaskTracker.API\obj\Debug\net9.0\ref\TaskTracker.API.dll
+C:\Users\admin\.vscode\TaskTrackerProject\TaskTracker.API\obj\Debug\net9.0\TaskTracker.API.sourcelink.json

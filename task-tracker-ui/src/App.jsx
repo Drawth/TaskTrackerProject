@@ -1,122 +1,95 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import { useTasks } from './hooks/useTasks';
+import { CheckCircle2, RotateCcw, Trash2, Plus } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import './App.css'; 
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { tasks, loading, addTask, toggleTask, deleteTask } = useTasks();
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [inputError, setInputError] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!title.trim()) {
+      setInputError(true);
+      return;
+    }
+    addTask(title, description);
+    setTitle('');
+    setDescription('');
+    setInputError(false);
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app-container">
+      <h2 className="header-title">Görev Yöneticisi</h2>
+      
+      <form className="task-form" onSubmit={handleSubmit}>
+        <div className="input-group">
+          <input 
+            className={`task-input ${inputError ? 'error-border' : ''}`}
+            value={title} 
+            onChange={(e) => {
+              setTitle(e.target.value);
+              setInputError(false);
+            }} 
+            placeholder="Ne yapacaksın?" 
+          />
+          {inputError && <span className="error-text">Görev başlığı boş bırakılamaz!</span>}
+          <input 
+            className="task-input"
+            value={description} 
+            onChange={(e) => setDescription(e.target.value)} 
+            placeholder="Detaylar (opsiyonel)" 
+          />
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+        <button className="btn-add" type="submit">
+          <Plus size={20} /> Ekle
         </button>
-      </section>
+      </form>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {loading ? <p className="loading-text">Görevler yükleniyor...</p> : (
+        <ul className="task-list">
+          <AnimatePresence>
+            {tasks.map(task => (
+              <motion.li 
+                key={task.id} 
+                layout // Yer değiştirme (alta süzülme) animasyonunu garanti eder
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.4 }}
+                className={`task-item ${task.isCompleted ? 'completed' : ''}`}
+              >
+                <div className="task-content">
+                  <p className="task-title">{task.title}</p>
+                  {task.description && <p className="task-desc">{task.description}</p>}
+                </div>
+                <div className="task-actions">
+                  <button 
+                    className="btn-action btn-complete"
+                    onClick={() => toggleTask(task.id)}
+                    title={task.isCompleted ? 'Geri Al' : 'Tamamla'}
+                  >
+                    {task.isCompleted ? <RotateCcw size={18} /> : <CheckCircle2 size={18} />}
+                  </button>
+                  <button 
+                    className="btn-action btn-delete"
+                    onClick={() => deleteTask(task.id)}
+                    title="Sil"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </motion.li>
+            ))}
+          </AnimatePresence>
+        </ul>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
